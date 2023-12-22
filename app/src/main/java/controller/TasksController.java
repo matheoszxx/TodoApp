@@ -46,4 +46,47 @@ public class TasksController {
         }
     }
     
+    //Método para fazer mudanças da tarefa
+    public void update(Tasks tasks){
+        String sql = "UPDATE tasks SET "
+                + "idProject = ?, "
+                + "name = ?, "
+                + "description = ?, "
+                + "status = ?, "
+                + "notes = ?, "
+                + "deadline = ?, "
+                + "createdDate = ?, "
+                + "updateDate = ? "
+                + "WHERE id = ?";
+        
+        Connection connection = null;
+        PreparedStatement statement = null;
+        
+        try {
+            //Inicia a conexão com o banco de dados
+            connection = ConnectionFactory.getConnection();
+            
+            //Preparando a query
+            statement = connection.prepareStatement(sql);
+            
+            //Setando os valores do statement
+            statement.setInt(1, tasks.getIdProject());
+            statement.setString(2, tasks.getName());
+            statement.setString(3, tasks.getDescription());
+            statement.setBoolean(4, tasks.getStatus());
+            statement.setString(5, tasks.getNotes());
+            statement.setDate(6, new java.sql.Date(tasks.getDeadline().getTime()));
+            statement.setDate(7, new java.sql.Date(tasks.getCreatedDate().getTime()));
+            statement.setDate(8, new java.sql.Date(tasks.getUpdateDate().getTime()));
+            statement.setInt(9, tasks.getId());
+            
+            //Executando a query
+            statement.execute();
+        } catch (Exception ex) {
+            throw new RuntimeException("Erro ao atualizar a tarefa " + ex.getMessage(), ex);
+        } finally {
+            ConnectionFactory.closeConnection(connection, statement);
+        }
+    }
+    
 }
