@@ -74,4 +74,33 @@ public class ProjectController {
         }
     
     }
+    
+    public void removeById(int id){
+        
+        String sql = "DELETE FROM projects WHERE id = ?";
+        
+        Connection connection = null;
+        PreparedStatement statement = null;
+        
+        //Faz um tratamento de exeção 
+        try {
+            //Estabelece a conexão com o banco de dados
+            connection = ConnectionFactory.getConnection();
+            
+            //Preparando a query
+            statement = connection.prepareStatement(sql);
+            
+            //Setando os valores
+            statement.setInt(1, id);
+            statement.execute();
+            
+            
+        } catch (SQLException ex) {
+             throw new RuntimeException("Erro ao deletar o projeto." + ex.getMessage(), ex);
+             
+        }finally{
+            ConnectionFactory.closeConnection(connection, statement);
+        }
+        
+    }
 }
