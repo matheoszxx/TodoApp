@@ -45,4 +45,33 @@ public class ProjectController {
             ConnectionFactory.closeConnection(connection, statement);
         }
     }
+    
+    public void save(Project project){
+        
+        String sql = "INSERT INTO projects (name, "
+                + "description, "
+                + "createDate, "
+                + "updateDate ) VALUES (?, ?, ?, ?)";
+        
+        Connection connection = null;
+        PreparedStatement statement = null;
+        
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(sql);
+            
+            //Vamos setar os valores para cada "?" na query do banco de dados
+            statement.setString(1, project.getName());
+            statement.setString(2, project.getDescription());
+            statement.setDate(3, new Date(project.getCreatedDate().getTime()));
+            statement.setDate(4, new Date(project.getUpdateDate().getTime()));
+            statement.execute();
+            
+        } catch (SQLException ex) {
+            throw new RuntimeException("Erro ao salvar o projeto." + ex.getMessage(), ex);
+        }finally{
+            ConnectionFactory.closeConnection(connection, statement);
+        }
+    
+    }
 }
