@@ -3,7 +3,10 @@ package controller;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import model.Project;
 import util.ConnectionFactory;
 
@@ -102,5 +105,57 @@ public class ProjectController {
             ConnectionFactory.closeConnection(connection, statement);
         }
         
+    }
+    
+    //Método para buscar todos os projetos, sem filtro nenhum dentro do parametro do metodo
+    public List<Project> getAll(){
+        
+        String sql = "SELECT * FROM projects";
+        
+        Connection connection = null;
+        PreparedStatement statement = null;
+        
+        //Como na query SQL vou utilizar o SELECT, utilizaremos o ResultSet (para pegarmos o resultado do banco de dados)
+        ResultSet resultSet = null;
+        
+        //Criação da lista de projetos
+        List<Project> projects = new ArrayList<Project>();
+        
+        try {
+            //Inicia a conexão com o banco de dados
+            connection = ConnectionFactory.getConnection();
+            
+            //Prepara a query do banco de dados (String sql)
+            statement = connection.prepareStatement(sql);
+            
+            //Executa a query
+            resultSet = statement.executeQuery();
+            
+            //Estrutura de repetição para percorrer os resultados do resultSet 
+            while(resultSet.next()){
+                
+                //Criação de um novo projeto
+                Project project = new Project();
+                
+                //Setando todos os campos com base nas informações gerada pelo resultSet
+                project.setId(resultSet.getInt("id"));
+                project.setName(resultSet.getString("name"));
+                project.setDescription(resultSet.getString("description"));
+                project.setCreatedDate(resultSet.getDate("createDate"));
+                project.setUpdateDate(resultSet.getDate("updateDate"));
+                
+                //Adicionando o objeto "project" dentro da List<Project> projects
+                projects.add(project);
+            }
+        } catch (SQLException ex) {
+            
+            throw new RuntimeException("Erro ao buscar o projeto." + ex.getMessage(), ex);
+            
+        }finally{
+            
+            ConnectionFactory.closeConnection(connection, statement, resultSet);
+        }
+    
+        return projects;
     }
 }
