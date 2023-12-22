@@ -89,4 +89,27 @@ public class TasksController {
         }
     }
     
+    //Método para buscar o ID da tarefa e fazer o DELETE pelo ID
+    public void  removeById(int tasksId){
+        String sql = "DELETE FROM tasks WHERE id = ?"; //"?" é meu parametro 1
+        
+        Connection connection  = null;
+        PreparedStatement statement = null; 
+        
+        try {
+            //Estabelecendo uma conexão com o banco de dados
+            connection = ConnectionFactory.getConnection();
+            statement =  connection.prepareStatement(sql);
+            statement.setInt(1, tasksId);
+            statement.execute();
+            
+        } catch (Exception ex) {
+            throw new RuntimeException("Erro ao deletar a tarefa." + ex.getMessage(), ex);
+        } finally {
+            //aqui utilizamos o método com dois parametros (connection e statement) para fechar a conexão dos dois
+            //pois temos outro método com o mesmo nome (closeConnection) que tem um parametro 
+            ConnectionFactory.closeConnection(connection, statement);
+        }
+    }
+    
 }
