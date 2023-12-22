@@ -2,6 +2,9 @@ package controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import model.Tasks;
 import util.ConnectionFactory;
 
@@ -112,4 +115,53 @@ public class TasksController {
         }
     }
     
+    //Método para buscar todas as tarefas, porem filtramos comm o "idProject", pois so vamos querer ele
+    public List<Tasks> getAll(int idProject){
+        
+        //Montando a querry do sql
+        String sql = "SELECT * FROM tasks WHERE idProject = ?";
+        
+        Connection connection = null;
+        PreparedStatement statement = null;
+        //Classe que guarda valor depois que fazemos o SELECT no banco de dados
+        ResultSet resultSet = null;
+        
+        //Lista de tarefas que será devolvida quando a chamada do método acontecer
+        List<Tasks> tasks = new ArrayList<Tasks>();
+        
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, idProject);
+            //utilizaremos o executeQuery pois ele no retornara o ResultSet 
+            resultSet = statement.executeQuery();
+            
+            //enquanto tiver registro, faça:
+            while(resultSet.next()){
+                
+                //Setando todos os campos
+                Tasks task = new Tasks();
+                task.setId(resultSet.getInt("id"));
+                task.setIdProject(resultSet.getInt("idProject"));
+                task.setName(resultSet.getString("name"));
+                task.setDescription(resultSet.getString("description"));
+                task.setStatus(resultSet.getBoolean("status"));
+                task.setNotes(resultSet.getString("notes"));
+                task.setDeadline(resultSet.getDate("deadline"));
+                task.setCreatedDate(resultSet.getDate("createdDate"));
+                task.setUpdateDate(resultSet.getDate("updateDate")); 
+                
+                //colocar a task (tarefa) dentro da lista de tarefa List<Tasks>
+                tasks.add(task);
+            }
+            
+        } catch (Exception ex) {
+             throw new RuntimeException("Erro ao inserir a tarefa." + ex.getMessage(), ex);
+        } finally {
+            ConnectionFactory.closeConnection(connection, statement, resultSet);
+        }
+        
+        //Listas de tarefas que foi criada e carregada do banco de dados
+        return tasks;
+    }
 }
