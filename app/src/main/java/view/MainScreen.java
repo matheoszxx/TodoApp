@@ -5,6 +5,8 @@
 package view;
 
 import controller.ProjectController;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -385,6 +387,13 @@ public final class MainScreen extends javax.swing.JFrame {
     private javax.swing.JTable jTableTasks;
     // End of variables declaration//GEN-END:variables
     
+    // METODO PARA CUSTOMIZAR O HEADER DA TABLE DE TAREFA
+    public void decorateTableTask(){
+        jTableTasks.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        jTableTasks.getTableHeader().setBackground(new Color(0, 153,102));
+        jTableTasks.getTableHeader().setForeground(new Color(255, 255, 255));
+        
+    }
     
     public void loadProjects(){
         // Obtém uma lista de todos os projetos usando o controlador de projeto
