@@ -4,12 +4,21 @@
  */
 package view;
 
+import controller.ProjectController;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import javax.swing.DefaultListModel;
+import model.Project;
+
 /**
  *
  * @author matheus.silva
  */
 public final class MainScreen extends javax.swing.JFrame {
     
+    ProjectController projectController;
+    DefaultListModel projectsModel;
    
     public MainScreen() {
         initComponents();
@@ -290,6 +299,20 @@ public final class MainScreen extends javax.swing.JFrame {
 
     private void jLabelProjectsAddMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelProjectsAddMouseClicked
        
+        // Cria uma instância da tela de diálogo de projeto
+        ProjectDialogScreen projectDialogScreen  = new ProjectDialogScreen(this, rootPaneCheckingEnabled);
+        // Torna a tela de diálogo visível para o usuário 
+        projectDialogScreen.setVisible(true);
+        
+        // Adiciona um ouvinte à tela de diálogo
+        projectDialogScreen.addWindowListener(new WindowAdapter() {
+            // Quando a tela de diálogo é fechada, atualiza a lista de projetos e reflete as mudanças na tela principal
+            public void windowClosed(WindowEvent e){
+                // Método responsável por carregar e exibir a lista de projetos
+                loadProjects();  
+            }
+        
+        });
     }//GEN-LAST:event_jLabelProjectsAddMouseClicked
 
     private void jLabelTasksAddMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelTasksAddMouseClicked
@@ -363,8 +386,27 @@ public final class MainScreen extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     
     
+    public void loadProjects(){
+        // Obtém uma lista de todos os projetos usando o controlador de projeto
+        List<Project> projectsList = projectController.getAll();
+        
+        // Limpa o modelo de dados da lista de projetos
+        projectsModel.clear();
+        
+        // Itera sobre a lista de projetos e adiciona cada projeto ao modelo
+        for (int i = 0; i < projectsList.size(); i++) {
+            
+           // Obtém o projeto na posição i da lista 
+            Project projectIndex = projectsList.get(i);
+            // Adiciona o projeto ao modelo de dados
+            projectsModel.addElement(projectIndex);
+        }
+        
+        // Define o modelo atualizado na JList de projetos
+        jListProjects.setModel(projectsModel);
+       
+    }
   
-    
 
 }
 
