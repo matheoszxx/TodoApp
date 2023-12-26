@@ -4,13 +4,28 @@
  */
 package view;
 
+import controller.ProjectController;
+import javax.swing.JOptionPane;
+import model.Project;
+
 
 /**
  *
  * @author matheus.silva
  */
 public class ProjectDialogScreen extends javax.swing.JDialog {
-
+    
+    ProjectController controller;
+    
+    
+    public ProjectDialogScreen(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        
+        //controller é quem gerencia o acesso dos dados no banco de dados"
+        controller = new ProjectController();
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -142,6 +157,29 @@ public class ProjectDialogScreen extends javax.swing.JDialog {
 
     private void jLabelToolBarSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelToolBarSaveMouseClicked
         
+        try {
+            // Verifica se o campo de nome não está vazio
+            if(! jTextFieldName.getText().equals("")){
+                // Cria uma instância do objeto Project
+                Project project  = new Project();
+                // Obtém o texto digitado no campo da tela para salvar no banco de dados
+                project.setName(jTextFieldName.getText());
+                project.setDescription(jTextAreaDescription.getText());
+
+                // Após configurar o Nome e a Descrição, salva o projeto usando o controlador
+                controller.save(project);
+                
+                // Exibe uma mensagem de sucesso em um pop-up
+                JOptionPane.showMessageDialog(rootPane, "Projeto Salvo com Sucesso!");
+                // Fecha a janela após salvar com sucesso
+                this.dispose();
+            }else{
+                JOptionPane.showMessageDialog(rootPane, "O projeto nao foi salvo, "
+                        + "pois o campo NOME nao foi preenchido");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
     }//GEN-LAST:event_jLabelToolBarSaveMouseClicked
 
     /**
@@ -170,12 +208,22 @@ public class ProjectDialogScreen extends javax.swing.JDialog {
             java.util.logging.Logger.getLogger(ProjectDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ProjectDialogScreen().setVisible(true);
+                // Cria uma instância de ProjectDialogScreen
+                ProjectDialogScreen dialog = new ProjectDialogScreen(new javax.swing.JFrame(), true);
+                // Adiciona um ouvinte de janela para lidar com o evento de fechamento da janela
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        // Sai da aplicação quando a janela está sendo fechada
+                        System.exit(0);
+                    }
+                });
+                // Define o diálogo para ser visível
+                dialog.setVisible(true);
             }
         });
     }
