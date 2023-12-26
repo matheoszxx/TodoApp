@@ -4,18 +4,30 @@
  */
 package view;
 
+import controller.TasksController;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import model.Project;
+import model.Tasks;
+
 /**
  *
  * @author matheus.silva
  */
 public class TaskDialogScreen extends javax.swing.JDialog {
 
+    TasksController controller;
+    Project project;
+
     /**
      * Creates new form TaskDialogScreen
      */
-    public TaskDialogScreen() {
+    public TaskDialogScreen(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
-        
+        hideErrorFields();
+        controller = new TasksController();
     }
 
     /**
@@ -190,6 +202,45 @@ public class TaskDialogScreen extends javax.swing.JDialog {
 
     private void jLabelToolBarSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelToolBarSaveMouseClicked
         // TODO add your handling code here:
+        
+        try {
+            // Verifica se os campos da tarefa são válidos antes de prosseguir
+            if(isFieldsValid()){
+                // Cria uma nova instância de Tarefa
+                Tasks tasks = new Tasks();
+
+                // Define o ID do projeto ao qual a tarefa pertence
+                tasks.setIdProject(project.getId());
+
+                // Define as informações da tarefa com base nos dados fornecidos pelo usuário
+                tasks.setName(jTextFieldName.getText());
+                tasks.setDescription(jTextAreaDescription.getText());
+                tasks.setNotes(jTextAreaNote.getText());
+                tasks.setStatus(false);
+
+                // Converte e define a data da tarefa usando o formato específico
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date deadline;
+                deadline = (Date) dateFormat.parse(jFormattedTextFieldDeadline.getText());
+                tasks.setDeadline(deadline);
+
+                // Salva os dados da tarefa usando o controlador correspondente
+                controller.save(tasks);
+                
+                // Exibe uma mensagem de sucesso em um pop-up
+                JOptionPane.showMessageDialog(rootPane, "Tarefa adicionada com sucesso!");
+                // Fecha a janela após adicionar a tarefa com sucesso
+                this.dispose();
+            }else{
+                // Se os campos obrigatórios não foram preenchidos, exibe mensagens de erro
+                if(jTextFieldName.getText().isEmpty() || jFormattedTextFieldDeadline.getText().isEmpty()){
+                    jLabelErrorName.setVisible(true);
+                    jLabelErrorDeadline.setVisible(true);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
     }//GEN-LAST:event_jLabelToolBarSaveMouseClicked
 
     private void jFormattedTextFieldDeadlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldDeadlineActionPerformed
@@ -207,27 +258,37 @@ public class TaskDialogScreen extends javax.swing.JDialog {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Java swing".equals(info.getName())) {
+                if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ProjectDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ProjectDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ProjectDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ProjectDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskDialogScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
 
-        /* Create and display the dialog */
+        // Invoca a execução do código na fila de eventos da interface gráfica
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new TaskDialogScreen().setVisible(true);
+                // Cria uma instância do diálogo de tarefas
+                TaskDialogScreen dialog = new TaskDialogScreen(new javax.swing.JFrame(), true);
+                // Adiciona um ouvinte de janela para lidar com o evento de fechamento da janela
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        // Encerra a aplicação quando a janela está sendo fechada
+                        System.exit(0);
+                    }
+                });
+                // Define o diálogo para ser visível
+                dialog.setVisible(true);
             }
         });
     }
@@ -252,5 +313,21 @@ public class TaskDialogScreen extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     
+    public void setProject(Project project) {
+        this.project = project;
+    }
+    
+    public void hideErrorFields(){
+        jLabelErrorName.setVisible(false);
+        jLabelErrorDeadline.setVisible(false);
+    }
+    
+    public boolean isFieldsValid(){
+        if(! jTextFieldName.getText().isEmpty() && ! jFormattedTextFieldDeadline.getText().isEmpty()){
+            return true;
+        }else{
+            return false;
+        }
+    }
     
 }
