@@ -5,6 +5,7 @@
 package view;
 
 import controller.ProjectController;
+import controller.TasksController;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
@@ -12,6 +13,8 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import model.Project;
+import model.Tasks;
+import util.TaskTableModel;
 
 /**
  *
@@ -20,10 +23,18 @@ import model.Project;
 public final class MainScreen extends javax.swing.JFrame {
     
     ProjectController projectController;
+    TasksController taskController;
+    
     DefaultListModel projectsModel;
+    TaskTableModel tasksModel;
    
     public MainScreen() {
         initComponents();
+        
+        initDataController();
+        initComponentsModel();
+        
+        decorateTableTask();
            
     }
 
@@ -318,7 +329,33 @@ public final class MainScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabelProjectsAddMouseClicked
 
     private void jLabelTasksAddMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelTasksAddMouseClicked
-
+        
+        // Cria uma instância da tela de diálogo de tarefa
+        TaskDialogScreen taskDialogoScreen = new TaskDialogScreen(this, rootPaneCheckingEnabled);
+        
+        // Obtém o índice do projeto selecionado na lista de projetos
+        int projectIndex = jListProjects.getSelectedIndex();
+        // Seleciona o projeto no modelo de projetos
+        Project p = (Project) projectsModel.get(projectIndex);
+        taskDialogoScreen.setProject(p);
+        
+        // Torna a tela de diálogo de tarefa visível
+        taskDialogoScreen.setVisible(true);
+        
+        // Adiciona um ouvinte de janela à tela de diálogo de tarefa
+        taskDialogoScreen.addWindowListener(new WindowAdapter() {
+            
+            // Quando a tela de diálogo de tarefa é fechada, atualiza a lista de tarefas na tela principal
+            public void windowClosed(WindowEvent e){
+                
+                // Obtém novamente o índice do projeto selecionado
+                int projectIndex = jListProjects.getSelectedIndex();
+                // Obtém o objeto de projeto do modelo de projetos
+                Project p = (Project) projectsModel.get(projectIndex);
+                // Carrega e exibe as tarefas associadas ao projeto selecionado
+                loadTask(p.getId());
+            } 
+        });
     }//GEN-LAST:event_jLabelTasksAddMouseClicked
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
@@ -393,6 +430,90 @@ public final class MainScreen extends javax.swing.JFrame {
         jTableTasks.getTableHeader().setBackground(new Color(0, 153,102));
         jTableTasks.getTableHeader().setForeground(new Color(255, 255, 255));
         
+        jTableTasks.setAutoCreateRowSorter(true);
+    }
+    
+    public void initDataController(){
+        
+        projectController = new ProjectController();
+        taskController = new TasksController();
+    }
+    
+    //METODO PARA INSTANCIAR O "projectModel"
+    public void initComponentsModel(){
+       
+        //INICIANDO O "projectsModel"
+        projectsModel = new DefaultListModel();
+        
+        //CARREGAR OS PROJETOS PARA DENTRO DO "projectModel"
+        loadProjects();
+        
+        //INSTANCIANDO O "tasksModel"
+        tasksModel = new TaskTableModel();
+        //FIZ O "jTable" USAR O "tasksModel" NESSA LINHA DE CÓDIGO
+        jTableTasks.setModel(tasksModel);
+        
+        //ESSA PARTE FOI FEITA PARA QUANDO INCIARMOS O PROJETO JÁ INICIAR COM O PRIMEIRO PROJETO SELECIONADO NA TELA
+        //SE FOI CARREGADO ALGUM PROJETO (SE O PROJECT MODEL NÃO ESTIVER VAZIO...)
+        if(! projectsModel.isEmpty()){
+            //SETO A LISTA PARA TER A PRIMEIRA POSIÇÃO SELECIONADO (O INDICE 0)
+            jListProjects.setSelectedIndex(0);
+            //PEGO O PROJETO NA POSIÇÃO 0 DENTRO DO "projectsModel"
+            Project project = (Project) projectsModel.get(0);
+            //CARREGA AS TAREFAS COM BASE NO PROJETO SELECIONADO NA POSIÇÃO 0
+            loadTask(project.getId());
+        }
+        
+    }
+    
+    // Método para carregar as tarefas do banco de dados 
+    // e definir as tarefas no "TaskTableModel" para que essas informações sejam exibidas na tela.
+    public void loadTask(int idProject) {
+        // Carrega todas as tarefas existentes no banco de dados associadas ao projeto com o ID fornecido.
+        List<Tasks> tasksList = taskController.getAll(idProject);
+    
+        // Define as tarefas no "tasksModel" com a lista de tarefas carregadas do banco de dados.
+        tasksModel.setTasks(tasksList);
+    
+        // Chama o método para exibir a tabela de tarefas caso a lista não esteja vazia.
+        showjTableTasks(!tasksList.isEmpty());
+    }
+    
+    private void showjTableTasks(boolean hasTasks) {
+        // Verifica se há tarefas para exibir
+        if (hasTasks) {
+            // Se a mensagem de lista vazia estiver visível...
+            if (jPanelEmptyLists.isVisible()) {
+                // ...esconde a mensagem
+                jPanelEmptyLists.setVisible(false);
+                // e a remove da tela
+                jPanel5.remove(jPanelEmptyLists);
+            }
+
+            // Adiciona o JScrollPane ao jPanel5, pois há tarefas a serem exibidas
+            jPanel5.add(jScrollPaneTasks);
+            // Torna o componente JScrollPane visível
+            jScrollPaneTasks.setVisible(true);
+            // Ajusta o tamanho do JScrollPane para coincidir com o jPanel5
+            jScrollPaneTasks.setSize(jPanel5.getWidth(), jPanel5.getHeight());
+
+        // Se não houver tarefas
+        } else {
+            // Se o JScrollPane, que exibe as tarefas, estiver visível...
+            if (jScrollPaneTasks.isVisible()) {
+                // ...esconde-o
+                jScrollPaneTasks.setVisible(false);
+                // E remove-o do jPanel5
+                jPanel5.remove(jScrollPaneTasks);
+            }
+
+            // Adiciona a mensagem de lista vazia ao jPanel5
+            jPanel5.add(jPanelEmptyLists);
+            // Torna a mensagem visível
+            jPanelEmptyLists.setVisible(true);
+            // Ajusta o tamanho da mensagem para coincidir com o jPanel5
+            jPanelEmptyLists.setSize(jPanel5.getWidth(), jPanel5.getHeight());
+        }
     }
     
     public void loadProjects(){
@@ -415,7 +536,6 @@ public final class MainScreen extends javax.swing.JFrame {
         jListProjects.setModel(projectsModel);
        
     }
-  
 
 }
 

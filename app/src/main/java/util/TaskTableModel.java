@@ -1,6 +1,5 @@
 package util;
 
-//AQUI NESSA CLASSE "TaskTableModel" VOU IMPLEMENTAR O MODEL DO COMPONENTE jTable
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,38 +7,36 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import model.Tasks;
 
-
-//O MODEL "TaskTableModel" QUE VAI INTERLIGAR COM O COMPONENTE VISUAL jTable E VAI NOS MOSTRAR AS TAREFAS NA TELA DE CADA PROJETO
-//IMPLEMENTEI O CONCEITO DE HERANÇA COM A CLASSE JÁ EXISTENTE DO JAVA "AbstractTableModel"
-//"AbstractTableModel" É UMA IMPLEMENTAÇÃO MODEL PARA TABLE
+// Esta classe, "TaskTableModel", implementa o modelo para o componente visual jTable.
+// Ela herda de AbstractTableModel, uma implementação padrão de modelo para tabelas em Java.
 public class TaskTableModel extends AbstractTableModel {
     
-    //ADICIONANDO AS INFORMAÇÕES DA MINHA "TaskTableModel"
-    //1º
+    // Definição das colunas da tabela
     String[] columns = {"Nome", "Descrição", "Prazo", "Tarefa Concluida", "Editar", "Excluir"};
-    //2° 
-    //UMA LISTA QUE GUARDA TAREJA  = "List<Tasks>" 
+    
+    // Lista que armazena as tarefas a serem exibidas na tabela 
     List<Tasks> tasks = new ArrayList<>();
     
-    //METODO ABSTRATO QUANTIDADE DE LINHA
+    // Método abstrato que retorna o número de linhas na tabela
     @Override
     public int getRowCount() {
         return tasks.size(); 
     }
     
-    //MÉTODO ABSTRATO QUANTIDADE DE COLUNA
+    // Método abstrato que retorna o número de colunas na tabela
     @Override
     public int getColumnCount() {
         return columns.length;
     }
     
+    // Método para obter o nome da coluna com base no índice da coluna
     @Override
     public String getColumnName(int columnIndex){
         
         return columns[columnIndex];
-        
     }
     
+    // Método que define se uma célula é editável ou não (no caso, a coluna "Tarefa Concluída")
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex){
          if (columnIndex == 3) {
@@ -48,22 +45,19 @@ public class TaskTableModel extends AbstractTableModel {
          return false;
     }
     
+    // Método para obter a classe da coluna, útil para determinar o tipo de dado na célula
     @Override
-    //MÉTODO PARA DIZER QUAL TIPO DE CLASSE ESTÁ EM DETERMINADA COLUNA 
      public Class<?> getColumnClass(int columnIndex){
-        //SE A LISTA DE TAREFA NO BANCO DE DADOS ESTIVER VAZIA...
         if(tasks.isEmpty()){
-            //RETORNA O TIPO DE CLASSE "Object" (pois não tem nenhum dados lá)
             return Object.class;
         };
-        
         //CHAMA O METODO "getValueAt" E PEGAMOS O TIPO DE CLASSE DA LINHA E COLUNA ESPECIFICA
         return this.getValueAt(0, columnIndex).getClass();
          
      }
      
     
-    //METODO ABSTRATO PARA RETORNAR UM VALOR COM BASE NA LINHA E COLUNA 
+    // Método abstrato para obter o valor em uma determinada célula 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         
@@ -101,12 +95,12 @@ public class TaskTableModel extends AbstractTableModel {
     }
     
     @Override
-    //ESSE METODO SERVE PARA PREENCHER A CAIXA DE CHECK DA COLUNA STATUS (SE FOI CONCLUIDA OU NÃO)
+    // Método para definir o valor em uma determinada célula (usado para preencher a caixa de seleção na coluna "Tarefa Concluída")
     public void setValueAt(Object aValue, int rowIndex, int columnIndex){
-        //UTILIZOU UM "Cast" NESSA LINHA DE CÓDIGO DO TIPO "Object" PARA "boolean"
         tasks.get(rowIndex).setStatus((boolean) aValue);
     }
-
+    
+    // Métodos de acesso aos atributos da classe
     public String[] getColumns() {
         return columns;
     }

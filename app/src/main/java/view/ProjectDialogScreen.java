@@ -1,4 +1,4 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
@@ -16,7 +16,6 @@ import model.Project;
 public class ProjectDialogScreen extends javax.swing.JDialog {
     
     ProjectController controller;
-    
     
     public ProjectDialogScreen(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
