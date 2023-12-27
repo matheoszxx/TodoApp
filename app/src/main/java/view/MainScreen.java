@@ -360,7 +360,36 @@ public final class MainScreen extends javax.swing.JFrame {
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
         
+        // Pega a linha da "jTableTasks" a partir de um ponto na tela
+        // O ponto é o "evt" do parâmetro do método criado e ele nos mostra em que lugar foi o clique na linha e na coluna 
+        int rowIndex = jTableTasks.rowAtPoint(evt.getPoint());
+        int columnIndex = jTableTasks.columnAtPoint(evt.getPoint());
+        Tasks task = tasksModel.getTasks().get(rowIndex);
         
+        switch(columnIndex){
+            case 3:
+                // Pega a tarefa do "TaskTableModel" com base na linha que foi clicada  
+                taskController.update(task);
+                break;
+                
+            case 4:
+                
+                break;
+            
+            case 5:
+                
+                int tasksId = task.getId();
+                taskController.removeById(tasksId);
+                tasksModel.getTasks().remove(task);
+                
+                // Carregando o índice do projeto
+                int projectIndex = jListProjects.getSelectedIndex();
+                // Pegando o projeto selecionado pelo código acima
+                Project project = (Project) projectsModel.get(projectIndex);
+                loadTask(project.getId());
+                break;
+
+        }
         
     }//GEN-LAST:event_jTableTasksMouseClicked
     
