@@ -360,10 +360,22 @@ public final class MainScreen extends javax.swing.JFrame {
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
         
+        
+        
     }//GEN-LAST:event_jTableTasksMouseClicked
-
+    
+    // Manipula o evento de clique do mouse no componente jListProjects.
     private void jListProjectsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListProjectsMouseClicked
          
+        // Obtém o índice do item clicado.
+        int projectIndex = jListProjects.getSelectedIndex();
+        
+        // Obtém o projeto selecionado no modelo com base no índice.
+        // "(Project)" é uma conversão para o tipo Project.
+        Project p = (Project) projectsModel.get(projectIndex); 
+        
+        // Carrega as tarefas associadas ao projeto selecionado.
+        loadTask(p.getId());
     }//GEN-LAST:event_jListProjectsMouseClicked
 
     /**
