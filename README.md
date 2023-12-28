@@ -17,8 +17,8 @@ Este é um projeto de lista de projetos e tarefas desenvolvido em Java, utilizan
 
 1. Instale o XAMPP e inicie os módulos Apache e MySQL.
 2. Acesse o phpMyAdmin no navegador (geralmente em http://localhost/phpmyadmin/).
-3. Crie um novo banco de dados chamado `nome_do_banco`.
-4. Importe o script SQL fornecido em `database/schema.sql` para criar as tabelas necessárias.
+3. Crie um novo banco de dados chamado `todoapp`.
+4. Importe o script SQL fornecido em `todoapp.sql` para criar as tabelas necessárias.
 
 ## Como Executar
 
